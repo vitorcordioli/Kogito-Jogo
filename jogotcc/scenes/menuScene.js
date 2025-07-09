@@ -1,11 +1,11 @@
 class menuScene extends Phaser.Scene {
     constructor() {
-        super("mainMenu");
+        super("menuScene");
     }
 
     create() {
-        this.inicial = this.add.image(0, 0, "inicial").setOrigin(0);
-        this.inicial.setDisplaySize(this.scale.width, this.scale.height);
+        this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
+        this.bg3.setDisplaySize(this.scale.width, this.scale.height);
 
         const title = this.add.text(this.scale.width / 2, 100, "Kogito", {
             font: "68px Arial",

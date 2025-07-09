@@ -3,6 +3,7 @@ class gameScene extends Phaser.Scene {
         super("gameScene");
 
         this.score = 0;
+        this.atualPhase = 0;
         this.currentQuestionIndex = 0;
     }
 
@@ -10,45 +11,16 @@ class gameScene extends Phaser.Scene {
         this.load.image("pogona", "assets/pogona.jpg");
     }
 
-    create() {
-        this.questions = [
-            {
-                text: "Qual é a cor do céu?",
-                backgroundKey: "pergunta1",
-                imageKey: null,
-                answers: [
-                    { text: "Azul", correct: true },
-                    { text: "Verde", correct: false },
-                    { text: "Vermelho", correct: false },
-                    { text: "Amarelo", correct: false },
-                ]
-            },
-            {
-                text: "Qual é este animal?",
-                backgroundKey: "inicial",
-                imageKey: "pogona",
-                answers: [
-                    { text: "Leão", correct: false },
-                    { text: "Pogona", correct: true },
-                    { text: "Gato", correct: false },
-                    { text: "Lobo", correct: false },
-                ]
-            },
-            {
-                text: "Quantos planetas tem o sistema solar?",
-                backgroundKey: "pergunta2",
-                imageKey: null,
-                answers: [
-                    { text: "7", correct: false },
-                    { text: "8", correct: true },
-                    { text: "9", correct: false },
-                    { text: "10", correct: false },
-                ]
-            }
-        ];
+    create(data) {
+        this.atualPhase = data?.atualPhase || 0;
+        this.score = data?.score || 0;
+        this.currentQuestionIndex = 0;
 
-
-        Phaser.Utils.Array.Shuffle(this.questions);
+        this.availableBackgrounds = ["bg1", "bg2", "bg3"];
+        this.questions = Phaser.Utils.Array.Shuffle(phases[this.atualPhase].questions);
+        this.questions.forEach(q => {
+        q.backgroundKey = Phaser.Utils.Array.GetRandom(this.availableBackgrounds);
+    });
         this.questionGroup = this.add.group();
         this.showQuestion(this.currentQuestionIndex);
     }
@@ -169,7 +141,6 @@ class gameScene extends Phaser.Scene {
             }
         });
 
-        // Espera e vai pra próxima
         this.time.delayedCall(1000, () => {
             this.nextQuestion();
         });
@@ -180,7 +151,17 @@ class gameScene extends Phaser.Scene {
         if (this.currentQuestionIndex < this.questions.length) {
             this.showQuestion(this.currentQuestionIndex);
         } else {
-            console.log("Fim das perguntas!");
+            this.atualPhase++;
+
+            if (this.atualPhase < phases.length) {
+                this.scene.start("pontuacaoScene", {
+                    score: this.score,
+                    atualPhase: this.atualPhase - 1
+                });
+            } else {
+                console.log("Fim do jogo!");
+                //INCOMPLETO
+            }
         }
     }
 }
