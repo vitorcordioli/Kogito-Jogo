@@ -21,8 +21,8 @@ class pontuacaoScene extends Phaser.Scene {
     currentY += 120;
 
     this.add.graphics()
-      .fillStyle(0xdddddd, 1)
-      .fillRoundedRect(centerX - 220, currentY - 30, 440, 140, 30);
+      .fillStyle(0xffffff, 1)
+      .fillRoundedRect(centerX - 220, currentY - 30, 440, 140, 15);
 
     this.add.text(centerX, currentY, "Pontuação final:", {
       font: "34px Arial",
