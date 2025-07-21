@@ -8,7 +8,7 @@ class menuScene extends Phaser.Scene {
         this.bg3.setDisplaySize(this.scale.width, this.scale.height);
 
         const title = this.add.text(this.scale.width / 2, 100, "Kogito", {
-            font: "68px Arial",
+            font: "68px 'League Spartan'",
             fill: "#ffffff"
         }).setOrigin(0.5);
 
