@@ -25,7 +25,7 @@ class loginScene extends Phaser.Scene {
 
         this.emailInput = this.add.dom(this.scale.width / 2, panelY + 140).createFromHTML(`
              <label style="display: block; font-size: 18px; color: #000; margin-bottom: 3px; font-family: Arial;">Email:</label>
-      <input type="email" placeholder="Digite seu email" style="
+      <input id="email" type="email" placeholder="Digite seu email" style="
         width: 300px; 
         height: 35px; 
         font-size: 18px; 
@@ -38,7 +38,7 @@ class loginScene extends Phaser.Scene {
     `);
 
         this.passwordInput = this.add.dom(this.scale.width / 2, panelY + 225).createFromHTML(`
-            <label style="display: block; font-size: 18px; color: #000; margin-bottom: 3px; font-family: Arial;">Senha:</label>
+            <label style="display: block; font-size: 18px; color: #000; margin-bottom: 3px; font-family: Arial;">Senha (mínimo 6 caracteres):</label>
       <input id="passwordField" type="password" placeholder="Digite sua senha" style="
         width: 300px; 
         height: 35px; 
@@ -91,11 +91,34 @@ class loginScene extends Phaser.Scene {
         menuText.input.hitArea = bg.input.hitArea;
 
         bg.on("pointerup", () => {
-            const email = this.emailInput.node.value;
-            const senha = this.passwordInput.node.value;
-            console.log("Email:", email);
-            console.log("Senha:", senha);
-            // Aqui você pode colocar a lógica de login
+            const email = this.emailInput.node.querySelector('input').value;
+            const senha = this.passwordInput.node.querySelector('input').value;
+
+            fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Login efetuado com sucesso!');
+
+                        localStorage.setItem('token', data.token);
+
+                        this.scene.start('menuScene', {
+                            userId: data.user.id,
+                            email: data.user.email,
+                            fase: data.user.fase,
+                            pontuacao: data.user.pontuacao
+                        });
+                    } else {
+                        alert(data.error || 'Email ou senha incorretos');
+                    }
+                })
+                .catch(() => {
+                    alert('Erro ao conectar com o servidor');
+                });
         });
 
         bg.on("pointerover", () => {
@@ -122,7 +145,7 @@ class loginScene extends Phaser.Scene {
         }).setOrigin(0.5, 0).setInteractive({ useHandCursor: true });
 
         registreSe.on("pointerover", () => {
-            registreSe.setColor("#0056b3"); 
+            registreSe.setColor("#0056b3");
         });
 
         registreSe.on("pointerout", () => {

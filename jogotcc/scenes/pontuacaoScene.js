@@ -71,11 +71,31 @@ class pontuacaoScene extends Phaser.Scene {
       scoreText.input.hitArea = bg.input.hitArea;
 
       bg.on("pointerup", () => {
+
         if (option === "Continuar") {
-          this.scene.start("gameScene", {
-            atualPhase: this.atualPhase + 1,
-            score: this.score
-          });
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.error('Token não encontrado!');
+            return;
+          }
+          fetch('http://localhost:3000/updateProgress', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              fase: data.atualPhase + 1,
+              pontuacao: data.score
+            })
+          }).then(res => res.json())
+            .then(() => {
+              this.scene.start("gameScene", {
+                atualPhase: data.atualPhase + 1,
+                score: data.score,
+                userId: data.userId
+              });
+            });
         } else if (option === "Menu") {
           this.scene.start("menuScene");
         }

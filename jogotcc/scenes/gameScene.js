@@ -12,6 +12,7 @@ class gameScene extends Phaser.Scene {
     }
 
     create(data) {
+        this.userId = data.userId;
         this.atualPhase = data?.atualPhase || 0;
         this.score = data?.score || 0;
         this.currentQuestionIndex = 0;
@@ -156,7 +157,8 @@ class gameScene extends Phaser.Scene {
             if (this.atualPhase < phases.length) {
                 this.scene.start("pontuacaoScene", {
                     score: this.score,
-                    atualPhase: this.atualPhase - 1
+                    atualPhase: this.atualPhase - 1,
+                    userId: this.userId
                 });
             } else {
                 console.log("Fim do jogo!");

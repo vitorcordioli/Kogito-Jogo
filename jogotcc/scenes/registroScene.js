@@ -40,7 +40,7 @@ class registroScene extends Phaser.Scene {
 
         this.emailInput = this.add.dom(this.scale.width / 2, panelY + 140).createFromHTML(`
              <label style="display: block; font-size: 18px; color: #000; margin-bottom: 3px; font-family: Arial;">Email:</label>
-      <input type="email" placeholder="Digite seu email" style="
+      <input id="email" type="email" placeholder="Digite seu email" style="
         width: 300px; 
         height: 35px; 
         font-size: 18px; 
@@ -53,7 +53,7 @@ class registroScene extends Phaser.Scene {
     `);
 
         this.passwordInput = this.add.dom(this.scale.width / 2, panelY + 225).createFromHTML(`
-            <label style="display: block; font-size: 18px; color: #000; margin-bottom: 3px; font-family: Arial;">Senha:</label>
+            <label style="display: block; font-size: 18px; color: #000; margin-bottom: 3px; font-family: Arial;">Senha (mínimo 6 caracteres):</label>
       <input id="passwordField" type="password" placeholder="Digite sua senha" style="
         width: 300px; 
         height: 35px; 
@@ -68,7 +68,7 @@ class registroScene extends Phaser.Scene {
 
         this.showPasswordCheckbox = this.add.dom(this.scale.width / 2 + 90, panelY + 275).createFromHTML(`
   <label style="font-size: 15px; color: #000; cursor: pointer; user-select:none; font-family: Arial;">
-    <input id="showPassword" type="checkbox" style="margin-right: 3px;">
+    <input id="showPassword1" type="checkbox" style="margin-right: 3px;">
     Mostrar Senha
   </label>
 `);
@@ -89,16 +89,16 @@ class registroScene extends Phaser.Scene {
 
         this.showPasswordCheckbox2 = this.add.dom(this.scale.width / 2 + 90, panelY + 380).createFromHTML(`
   <label style="font-size: 15px; color: #000; cursor: pointer; user-select:none; font-family: Arial;">
-    <input id="showPassword" type="checkbox" style="margin-right: 3px;">
+    <input id="showPassword2" type="checkbox" style="margin-right: 3px;">
     Mostrar Senha
   </label>
 `);
 
 
         const passwordInputNode = this.passwordInput.node.querySelector('input[type="password"]');
-        const checkboxNode = this.showPasswordCheckbox.node.querySelector('#showPassword');
+        const checkboxNode = this.showPasswordCheckbox.node.querySelector('#showPassword1');
         const confirmPasswordInputNode = this.confirmPasswordInput.node.querySelector('input[type="password"]');
-        const checkboxNode2 = this.showPasswordCheckbox2.node.querySelector('#showPassword');
+        const checkboxNode2 = this.showPasswordCheckbox2.node.querySelector('#showPassword2');
 
         checkboxNode.addEventListener('change', (event) => {
             if (event.target.checked) {
@@ -138,7 +138,7 @@ class registroScene extends Phaser.Scene {
         menuText.input.hitArea = bg.input.hitArea;
 
         bg.on("pointerup", () => {
-            const email = this.emailInput.node.value;
+            const email = this.emailInput.node.querySelector("input").value;
             const senha = this.passwordInput.node.querySelector("input").value;
             const confirmSenha = this.confirmPasswordInput.node.querySelector("input").value;
 
@@ -147,9 +147,43 @@ class registroScene extends Phaser.Scene {
                 return;
             }
 
-            console.log("Email:", email);
-            console.log("Senha:", senha);
-            // Aqui você pode colocar a lógica de login
+            fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Usuário registrado com sucesso!');
+
+                        return fetch('http://localhost:3000/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, senha })
+                        });
+                    } else {
+                        throw new Error(data.error || 'Erro ao registrar');
+                    }
+                })
+                .then(res => res.json())
+                .then(loginData => {
+                    if (loginData.success) {
+                        localStorage.setItem('token', loginData.token);
+
+                        this.scene.start('menuScene', {
+                            userId: loginData.user.id,
+                            email: loginData.user.email,
+                            fase: loginData.user.fase,
+                            pontuacao: loginData.user.pontuacao
+                        });
+                    } else {
+                        alert('Erro ao logar após o registro');
+                    }
+                })
+                .catch(() => {
+                    alert('Erro ao conectar com o servidor');
+                });
         });
 
         bg.on("pointerover", () => {

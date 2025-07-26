@@ -3,6 +3,20 @@ class menuScene extends Phaser.Scene {
         super("menuScene");
     }
 
+    init(data) {
+        if (!localStorage.getItem('token')) {
+            alert("Você precisa estar logado.");
+            this.scene.start("loginScene"); 
+            return;
+        }
+
+
+        this.userId = data.userId;
+        this.email = data.email;
+        this.fase = data.fase;
+        this.pontuacao = data.pontuacao;
+    }
+
     create() {
         this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
         this.bg3.setDisplaySize(this.scale.width, this.scale.height);
@@ -37,8 +51,42 @@ class menuScene extends Phaser.Scene {
             menuText.input.hitArea = bg.input.hitArea;
 
             bg.on("pointerup", () => {
+
                 if (option === "Novo jogo") {
-                    this.scene.start("gameScene"); 
+                    if (this.fase > 0 || this.pontuacao > 0) {
+                        if (confirm("Você já tem um jogo salvo. Começar um novo jogo apagará o progresso atual. Deseja continuar?")) {
+                            fetch('http://localhost:3000/updateProgress', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify({
+                                    id: this.userId,
+                                    fase: 0,
+                                    pontuacao: 0
+                                })
+                            })
+                                .then(res => res.json())
+                                .then(() => {
+                                    this.scene.start("gameScene", { atualPhase: 0, score: 0, userId: this.userId });
+                                });
+                        }
+                    } else {
+                        this.scene.start("gameScene", { atualPhase: 0, score: 0, userId: this.userId });
+                    }
+                }
+
+                if (option === "Continuar jogo") {
+                    if (this.fase > 0 || this.pontuacao > 0) {
+                        this.scene.start("gameScene", {
+                            atualPhase: this.fase,
+                            score: this.pontuacao,
+                            userId: this.userId
+                        });
+                    } else {
+                        alert("Você ainda não tem progresso salvo.");
+                    }
                 }
             });
 
