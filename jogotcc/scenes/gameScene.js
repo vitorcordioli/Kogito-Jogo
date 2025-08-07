@@ -105,6 +105,59 @@ class gameScene extends Phaser.Scene {
                 btnBg.fillRoundedRect(btnX, btnY, btnWidth, btnHeight, 15);
             });
         });
+
+        //BOTÃO DE PAUSE
+
+        const pauseBtnX = this.scale.width - 90;
+        const pauseBtnY = 40;
+        const pauseBtnWidth = 50;
+        const pauseBtnHeight = 50;
+
+        const pauseBtn = this.add.graphics();
+        pauseBtn.fillStyle(0xffffff, 1);
+        pauseBtn.fillRoundedRect(pauseBtnX, pauseBtnY, pauseBtnWidth, pauseBtnHeight, 10);
+        pauseBtn.setInteractive(new Phaser.Geom.Rectangle(pauseBtnX, pauseBtnY, pauseBtnWidth, pauseBtnHeight), Phaser.Geom.Rectangle.Contains);
+        pauseBtn.input.cursor = 'pointer';
+
+        const barWidth = 6;
+        const barHeight = 20;
+        const barSpacing = 8;
+
+        const barY = pauseBtnY + (pauseBtnHeight - barHeight) / 2;
+        const bar1X = pauseBtnX + (pauseBtnWidth - barWidth * 2 - barSpacing) / 2;
+        const bar2X = bar1X + barWidth + barSpacing;
+
+        const pauseBar1 = this.add.rectangle(bar1X, barY, barWidth, barHeight, 0x000000).setOrigin(0, 0);
+        const pauseBar2 = this.add.rectangle(bar2X, barY, barWidth, barHeight, 0x000000).setOrigin(0, 0);
+
+        // === Eventos de hover ===
+        pauseBtn.on("pointerover", () => {
+            pauseBtn.clear();
+            pauseBtn.fillStyle(0xd1c3c2, 1);
+            pauseBtn.fillRoundedRect(pauseBtnX, pauseBtnY, pauseBtnWidth, pauseBtnHeight, 10);
+
+            // traz as barrinhas pra frente
+            this.children.bringToTop(pauseBar1);
+            this.children.bringToTop(pauseBar2);
+        });
+
+        pauseBtn.on("pointerout", () => {
+            pauseBtn.clear();
+            pauseBtn.fillStyle(0xffffff, 1);
+            pauseBtn.fillRoundedRect(pauseBtnX, pauseBtnY, pauseBtnWidth, pauseBtnHeight, 10);
+
+            this.children.bringToTop(pauseBar1);
+            this.children.bringToTop(pauseBar2);
+        });
+
+        pauseBtn.on("pointerup", () => {
+            this.scene.pause();
+            this.scene.launch("pauseScene", {
+                score: this.score,
+                atualPhase: this.atualPhase,
+                userId: this.userId,
+            });
+        });
     }
 
     showCorrectAnswer(btnBg) {

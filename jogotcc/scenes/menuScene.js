@@ -14,7 +14,7 @@ class menuScene extends Phaser.Scene {
         this.userId = data.userId;
         this.email = data.email;
         this.fase = data.fase;
-        this.pontuacao = data.pontuacao;
+        this.score = data.score;
     }
 
     create() {
@@ -81,7 +81,7 @@ class menuScene extends Phaser.Scene {
                     if (this.fase > 0 || this.pontuacao > 0) {
                         this.scene.start("gameScene", {
                             atualPhase: this.fase,
-                            score: this.pontuacao,
+                            score: this.score,
                             userId: this.userId
                         });
                     } else {

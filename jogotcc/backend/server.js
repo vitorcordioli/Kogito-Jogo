@@ -106,6 +106,28 @@ app.post('/updateProgress', autenticarToken,
   });
 });
 
+app.post('/saveProgressWithQuestion', autenticarToken, [
+  body('fase').isInt({ min: 0 }).toInt(),
+  body('pontuacao').isInt({ min: 0 }).toInt(),
+  body('pergunta_index').isInt({ min: 0 }).toInt()
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  const { fase, pontuacao, pergunta_index } = req.body;
+  const id = req.user.id;
+
+  const sql = 'UPDATE users SET fase = ?, pontuacao = ?, pergunta_index = ? WHERE id = ?';
+  db.query(sql, [fase, pontuacao, pergunta_index, id], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Erro ao salvar progresso com pergunta' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    res.json({ success: true });
+  });
+});
+
+
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');
 });

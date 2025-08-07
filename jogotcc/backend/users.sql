@@ -8,4 +8,5 @@ CREATE TABLE IF NOT EXISTS users (
   senha VARCHAR(255) NOT NULL,
   fase INT NOT NULL DEFAULT 0,
   pontuacao INT NOT NULL DEFAULT 0,
+  perguntas_index INT NOT NULL DEFAULT 0,
 );
