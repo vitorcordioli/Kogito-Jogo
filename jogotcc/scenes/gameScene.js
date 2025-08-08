@@ -4,7 +4,6 @@ class gameScene extends Phaser.Scene {
 
         this.score = 0;
         this.atualPhase = 0;
-        this.currentQuestionIndex = 0;
     }
 
     preload() {
@@ -15,13 +14,10 @@ class gameScene extends Phaser.Scene {
         this.userId = data.userId;
         this.atualPhase = data?.atualPhase || 0;
         this.score = data?.score || 0;
-        this.currentQuestionIndex = 0;
+        this.currentQuestionIndex = data?.perguntaIndex || 0;
 
         this.availableBackgrounds = ["bg1", "bg2", "bg3"];
-        this.questions = Phaser.Utils.Array.Shuffle(phases[this.atualPhase].questions);
-        this.questions.forEach(q => {
-        q.backgroundKey = Phaser.Utils.Array.GetRandom(this.availableBackgrounds);
-    });
+        this.questions = phases[this.atualPhase].questions;
         this.questionGroup = this.add.group();
         this.showQuestion(this.currentQuestionIndex);
     }
@@ -29,11 +25,19 @@ class gameScene extends Phaser.Scene {
     showQuestion(index) {
         const question = this.questions[index];
 
+        if (!question) {
+            console.warn("Pergunta não encontrada no índice:", index);
+            this.scene.start("menuScene");
+            return;
+        }
+
         if (this.currentBackground) {
             this.currentBackground.destroy();
         }
 
-        this.currentBackground = this.add.image(0, 0, question.backgroundKey).setOrigin(0);
+        const backgroundKey = Phaser.Utils.Array.GetRandom(this.availableBackgrounds);
+
+        this.currentBackground = this.add.image(0, 0, backgroundKey).setOrigin(0);
         this.currentBackground.setDisplaySize(this.scale.width, this.scale.height);
         this.children.bringToTop(this.questionGroup);
 
@@ -154,8 +158,9 @@ class gameScene extends Phaser.Scene {
             this.scene.pause();
             this.scene.launch("pauseScene", {
                 score: this.score,
-                atualPhase: this.atualPhase,
+                fase: this.atualPhase,
                 userId: this.userId,
+                questionIndex: this.currentQuestionIndex
             });
         });
     }
@@ -202,16 +207,54 @@ class gameScene extends Phaser.Scene {
 
     nextQuestion() {
         this.currentQuestionIndex++;
+
+        fetch("http://localhost:3000/saveProgressWithQuestion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                id: this.userId,
+                fase: this.atualPhase,
+                pontuacao: this.score,
+                perguntas_index: this.currentQuestionIndex
+            })
+        });
+
         if (this.currentQuestionIndex < this.questions.length) {
             this.showQuestion(this.currentQuestionIndex);
         } else {
             this.atualPhase++;
 
             if (this.atualPhase < phases.length) {
-                this.scene.start("pontuacaoScene", {
-                    score: this.score,
-                    atualPhase: this.atualPhase - 1,
-                    userId: this.userId
+                fetch("http://localhost:3000/saveProgressWithQuestion", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        id: this.userId,
+                        fase: this.atualPhase,
+                        pontuacao: this.score,
+                        perguntas_index: 0 
+                    })
+                }).then(() => {
+                    this.scene.start("pontuacaoScene", {
+                        score: this.score,
+                        atualPhase: this.atualPhase - 1,
+                        userId: this.userId,
+                        perguntaIndex: 0
+                    });
+                }).catch(err => {
+                    console.error("Erro ao resetar índice no backend:", err);
+                    this.scene.start("pontuacaoScene", {
+                        score: this.score,
+                        atualPhase: this.atualPhase - 1,
+                        userId: this.userId,
+                        perguntaIndex: 0
+                    });
                 });
             } else {
                 console.log("Fim do jogo!");

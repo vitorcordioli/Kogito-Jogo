@@ -6,15 +6,15 @@ class menuScene extends Phaser.Scene {
     init(data) {
         if (!localStorage.getItem('token')) {
             alert("Você precisa estar logado.");
-            this.scene.start("loginScene"); 
+            this.scene.start("loginScene");
             return;
         }
-
 
         this.userId = data.userId;
         this.email = data.email;
         this.fase = data.fase;
         this.score = data.score;
+        this.perguntaIndex = data.perguntaIndex;
     }
 
     create() {
@@ -26,6 +26,33 @@ class menuScene extends Phaser.Scene {
             fill: "#ffffff"
         }).setOrigin(0.5);
 
+        fetch("http://localhost:3000/getProgressWithQuestions", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    this.fase = data.fase || 0;
+                    this.score = data.pontuacao || 0;
+                    this.perguntaIndex = data.perguntas_index || 0;
+                    this.userId = data.userId;
+                    this.criarMenu();
+                } else {
+                    alert("Erro ao carregar progresso: " + (data.error || "Erro desconhecido"));
+                    this.criarMenu();
+                }
+            })
+            .catch(() => {
+                alert("Erro de conexão com o servidor.");
+                this.criarMenu();
+            });
+    }
+
+    criarMenu() {
         const menuOptions = ["Continuar jogo", "Novo jogo", "Opções", "Créditos"];
         menuOptions.forEach((option, index) => {
             const x = this.scale.width / 2;
@@ -53,7 +80,7 @@ class menuScene extends Phaser.Scene {
             bg.on("pointerup", () => {
 
                 if (option === "Novo jogo") {
-                    if (this.fase > 0 || this.pontuacao > 0) {
+                    if (this.fase > 0 || this.score > 0) {
                         if (confirm("Você já tem um jogo salvo. Começar um novo jogo apagará o progresso atual. Deseja continuar?")) {
                             fetch('http://localhost:3000/updateProgress', {
                                 method: 'POST',
@@ -64,25 +91,27 @@ class menuScene extends Phaser.Scene {
                                 body: JSON.stringify({
                                     id: this.userId,
                                     fase: 0,
-                                    pontuacao: 0
+                                    pontuacao: 0,
+                                    perguntas_index: 0
                                 })
                             })
                                 .then(res => res.json())
                                 .then(() => {
-                                    this.scene.start("gameScene", { atualPhase: 0, score: 0, userId: this.userId });
+                                    this.scene.start("gameScene", { atualPhase: 0, score: 0, userId: this.userId, perguntaIndex: 0 });
                                 });
                         }
                     } else {
-                        this.scene.start("gameScene", { atualPhase: 0, score: 0, userId: this.userId });
+                        this.scene.start("gameScene", { atualPhase: 0, score: 0, userId: this.userId, perguntaIndex: 0 });
                     }
                 }
 
                 if (option === "Continuar jogo") {
-                    if (this.fase > 0 || this.pontuacao > 0) {
+                    if (this.fase > 0 || this.score > 0) {
                         this.scene.start("gameScene", {
                             atualPhase: this.fase,
                             score: this.score,
-                            userId: this.userId
+                            userId: this.userId,
+                            perguntaIndex: this.perguntaIndex
                         });
                     } else {
                         alert("Você ainda não tem progresso salvo.");

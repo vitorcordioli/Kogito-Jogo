@@ -19,21 +19,25 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
-db.connect(err => {
-  if (err) console.error('Erro ao conectar:', err);
-  else console.log('Conectado ao MySQL!');
-});
+  db.connect(err => {
+    if (err) {
+      console.error('Erro ao conectar:', err);
+    } else {
+      console.log('Conectado ao MySQL!');
+      console.log("Banco conectado:", process.env.DB_NAME);
+    }
+  });
 
 function autenticarToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; 
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) return res.status(401).json({ error: 'Token não fornecido' });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: 'Token inválido' });
-    req.user = user; 
-    next(); 
+    req.user = user;
+    next();
   });
 }
 
@@ -79,13 +83,14 @@ app.post('/login', (req, res) => {
         id: user.id,
         email: user.email,
         fase: user.fase,
-        pontuacao: user.pontuacao
+        pontuacao: user.pontuacao,
+        perguntas_index: user.perguntas_index
       }
     });
   });
 });
 
-app.post('/updateProgress', autenticarToken, 
+app.post('/updateProgress', autenticarToken,
   [
     body('fase').isInt({ min: 0 }).toInt(),
     body('pontuacao').isInt({ min: 0 }).toInt()
@@ -94,36 +99,64 @@ app.post('/updateProgress', autenticarToken,
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  const { fase, pontuacao } = req.body;
-  const id = req.user.id;
-  const sql = 'UPDATE users SET fase = ?, pontuacao = ? WHERE id = ?';
-  db.query(sql, [fase, pontuacao, id], (err, result) => {
-    if (err) return res.status(500).json({ error: 'Erro ao atualizar progresso' });
-    if (result.affectedRows === 0) {
+    const { fase, pontuacao } = req.body;
+    const id = req.user.id;
+    const sql = 'UPDATE users SET fase = ?, pontuacao = ? WHERE id = ?';
+    db.query(sql, [fase, pontuacao, id], (err, result) => {
+      if (err) return res.status(500).json({ error: 'Erro ao atualizar progresso' });
+      if (result.affectedRows === 0) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
       }
-    res.json({ success: true });
+      res.json({ success: true });
+    });
   });
-});
 
 app.post('/saveProgressWithQuestion', autenticarToken, [
   body('fase').isInt({ min: 0 }).toInt(),
   body('pontuacao').isInt({ min: 0 }).toInt(),
-  body('pergunta_index').isInt({ min: 0 }).toInt()
+  body('perguntas_index').isInt({ min: 0 }).toInt()
 ], (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  const { fase, pontuacao, pergunta_index } = req.body;
+  const { fase, pontuacao, perguntas_index } = req.body;
   const id = req.user.id;
 
-  const sql = 'UPDATE users SET fase = ?, pontuacao = ?, pergunta_index = ? WHERE id = ?';
-  db.query(sql, [fase, pontuacao, pergunta_index, id], (err, result) => {
-    if (err) return res.status(500).json({ error: 'Erro ao salvar progresso com pergunta' });
+  db.query('SHOW COLUMNS FROM users', (err, results) => {
+    if (err) {
+      console.error('Erro ao listar colunas:', err);
+    } else {
+      console.log('Colunas da tabela users:', results);
+    }
+  });
+
+
+  const sql = 'UPDATE users SET fase = ?, pontuacao = ?, perguntas_index = ? WHERE id = ?';
+  db.query(sql, [fase, pontuacao, perguntas_index, id], (err, result) => {
+    if (err) {
+      console.error("Erro no SQL:", err);
+      return res.status(500).json({ error: 'Erro ao salvar progresso com perguntas' });
+    }
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
+
     res.json({ success: true });
+  });
+});
+
+app.get('/getProgressWithQuestions', autenticarToken, (req, res) => {
+  const id = req.user.id;
+  const sql = 'SELECT fase, pontuacao, perguntas_index FROM users WHERE id = ?';
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Erro ao buscar progresso' });
+    if (results.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({
+      success: true,
+      fase: results[0].fase,
+      pontuacao: results[0].pontuacao,
+      perguntas_index: results[0].perguntas_index
+    });
   });
 });
 

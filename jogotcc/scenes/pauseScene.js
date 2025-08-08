@@ -10,6 +10,7 @@ class pauseScene extends Phaser.Scene {
         this.userId = data.userId;
         this.fase = data.fase;
         this.pontuacao = data.score;
+        this.questionIndex = data.questionIndex || 0;
 
         const centerX = this.scale.width / 2;
         let currentY = 100;
@@ -47,12 +48,91 @@ class pauseScene extends Phaser.Scene {
                     this.scene.resume("gameScene");
                     this.scene.stop();
                 } else if (option === "Menu & Salvar") {
+                    const token = localStorage.getItem("token");
 
+                    if (!token) {
+                        alert("Token não encontrado. Faça login novamente.");
+                        this.scene.start("loginScene");
+                        return;
+                    }
+
+                    console.log("Dados enviados:", {
+                        fase: this.fase,
+                        pontuacao: this.pontuacao,
+                        perguntas_index: this.questionIndex
+                    });
+
+
+                    fetch("http://localhost:3000/saveProgressWithQuestion", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            id: this.userId,
+                            fase: this.fase,
+                            pontuacao: this.pontuacao,
+                            perguntas_index: this.questionIndex
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(response => {
+                            if (response.success) {
+                                alert("Progresso salvo com sucesso!");
+                                this.scene.stop("gameScene");
+                                this.scene.start("menuScene");
+                            } else {
+                                alert("Erro ao salvar progresso: " + (response.error || "Erro desconhecido"));
+                            }
+                        })
+                        .catch(() => {
+                            alert("Erro de conexão com o servidor.");
+                        });
                 } else if (option === "Menu sem salvar") {
-                    const sair = confirm("Você sairá sem salvar o progresso. Deseja continuar?");
+                    const sair = confirm("Se continuar, todo seu progresso será apagado. Tem certeza que quer fazer isso?");
                     if (sair) {
-                        this.scene.stop("gameScene");
-                        this.scene.start("menuScene");
+                        const token = localStorage.getItem("token");
+
+                        if (!token) {
+                            alert("Token não encontrado. Faça login novamente.");
+                            this.scene.start("loginScene");
+                            return;
+                        }
+
+                        fetch("http://localhost:3000/saveProgressWithQuestion", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                fase: 0,
+                                pontuacao: 0,
+                                perguntas_index: 0
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    this.scene.stop("gameScene");
+                                    this.scene.start("menuScene", {
+                                        userId: this.userId,
+                                        fase: 0,
+                                        score: 0,
+                                        perguntaIndex: 0
+                                    });
+                                } else {
+                                    alert("Erro ao zerar progresso: " + (data.error || "Erro desconhecido"));
+                                    this.scene.stop("gameScene");
+                                    this.scene.start("menuScene");
+                                }
+                            })
+                            .catch(() => {
+                                alert("Erro de conexão com o servidor.");
+                                this.scene.stop("gameScene");
+                                this.scene.start("menuScene");
+                            });
                     }
                 }
             });

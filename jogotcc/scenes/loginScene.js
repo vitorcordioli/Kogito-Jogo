@@ -110,7 +110,8 @@ class loginScene extends Phaser.Scene {
                             userId: data.user.id,
                             email: data.user.email,
                             fase: data.user.fase,
-                            pontuacao: data.user.pontuacao
+                            pontuacao: data.user.pontuacao,
+                            perguntaIndex: data.user.perguntas_index || 0
                         });
                     } else {
                         alert(data.error || 'Email ou senha incorretos');

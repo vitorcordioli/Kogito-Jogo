@@ -13,6 +13,33 @@ class pontuacaoScene extends Phaser.Scene {
     this.score = data.score;
     this.atualPhase = data.atualPhase;
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token não encontrado!');
+      return;
+    }
+
+    fetch('http://localhost:3000/updateProgress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        fase: data.atualPhase + 1,
+        pontuacao: data.score
+      })
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (!response.success) {
+          console.error("Erro ao salvar progresso automático:", response.error);
+        }
+      })
+      .catch(err => {
+        console.error("Erro na requisição automática:", err);
+      });
+
     this.add.text(centerX, currentY, `Você concluiu a fase ${this.atualPhase + 1}!`, {
       font: "38px Arial",
       fill: "#ffffff"
@@ -73,32 +100,14 @@ class pontuacaoScene extends Phaser.Scene {
       bg.on("pointerup", () => {
 
         if (option === "Continuar") {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            console.error('Token não encontrado!');
-            return;
-          }
-          fetch('http://localhost:3000/updateProgress', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              fase: data.atualPhase + 1,
-              pontuacao: data.score
-            })
-          }).then(res => res.json())
-            .then(() => {
-              this.scene.start("gameScene", {
-                atualPhase: data.atualPhase + 1,
-                score: data.score,
-                userId: data.userId
-              });
-            });
+          this.scene.start("gameScene", {
+            atualPhase: data.atualPhase + 1,
+            score: data.score,
+            userId: data.userId
+          });
         } else if (option === "Menu") {
           this.scene.start("menuScene");
-        }
+        };
       });
 
       bg.on("pointerover", () => {
