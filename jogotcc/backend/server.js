@@ -122,15 +122,6 @@ app.post('/saveProgressWithQuestion', autenticarToken, [
   const { fase, pontuacao, perguntas_index } = req.body;
   const id = req.user.id;
 
-  db.query('SHOW COLUMNS FROM users', (err, results) => {
-    if (err) {
-      console.error('Erro ao listar colunas:', err);
-    } else {
-      console.log('Colunas da tabela users:', results);
-    }
-  });
-
-
   const sql = 'UPDATE users SET fase = ?, pontuacao = ?, perguntas_index = ? WHERE id = ?';
   db.query(sql, [fase, pontuacao, perguntas_index, id], (err, result) => {
     if (err) {

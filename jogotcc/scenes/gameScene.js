@@ -19,7 +19,83 @@ class gameScene extends Phaser.Scene {
         this.availableBackgrounds = ["bg1", "bg2", "bg3"];
         this.questions = phases[this.atualPhase].questions;
         this.questionGroup = this.add.group();
+        this.createPersistentButtons();
+
         this.showQuestion(this.currentQuestionIndex);
+
+        document.getElementById("closeModal").onclick = function () {
+            document.getElementById("explanationModal").style.display = 'none';
+        };
+    }
+
+    createPersistentButtons() {
+        const verExpWidth = 280;
+        const verExpHeight = 60;
+        const verExpX = 60;
+        const verExpY = this.scale.height - 350;
+
+        this.explanationBtnBg = this.add.graphics();
+        this.explanationBtnBg.fillStyle(0xffffff, 1);
+        this.explanationBtnBg.fillRoundedRect(verExpX, verExpY, verExpWidth, verExpHeight, 15);
+        this.explanationBtnBg.setInteractive(new Phaser.Geom.Rectangle(verExpX, verExpY, verExpWidth, verExpHeight), Phaser.Geom.Rectangle.Contains);
+        this.explanationBtnBg.input.cursor = 'pointer';
+        this.explanationBtnBg.setVisible(false);
+
+        this.explanationBtnText = this.add.text(verExpX + verExpWidth / 2, verExpY + verExpHeight / 2, "Ver Explicação", {
+            font: "24px Arial",
+            color: "#000000"
+        }).setOrigin(0.5);
+        this.explanationBtnText.setVisible(false);
+
+        this.explanationBtnBg.on("pointerup", () => {
+            const question = this.questions[this.currentQuestionIndex];
+            this.showExplanation(question);
+        });
+
+        this.explanationBtnBg.on("pointerover", () => {
+            this.explanationBtnBg.clear();
+            this.explanationBtnBg.fillStyle(0xd1c3c2, 1);
+            this.explanationBtnBg.fillRoundedRect(verExpX, verExpY, verExpWidth, verExpHeight, 15);
+        });
+
+        this.explanationBtnBg.on("pointerout", () => {
+            this.explanationBtnBg.clear();
+            this.explanationBtnBg.fillStyle(0xffffff, 1);
+            this.explanationBtnBg.fillRoundedRect(verExpX, verExpY, verExpWidth, verExpHeight, 15);
+        });
+
+        // Próxima pergunta
+        const nextWidth = 280;
+        const nextHeight = 60;
+        const nextX = this.scale.width - nextWidth - 60;
+        const nextY = this.scale.height - 350;
+
+        this.nextBtnBg = this.add.graphics();
+        this.nextBtnBg.fillStyle(0xffffff, 1);
+        this.nextBtnBg.fillRoundedRect(nextX, nextY, nextWidth, nextHeight, 15);
+        this.nextBtnBg.setInteractive(new Phaser.Geom.Rectangle(nextX, nextY, nextWidth, nextHeight), Phaser.Geom.Rectangle.Contains);
+        this.nextBtnBg.input.cursor = 'pointer';
+        this.nextBtnBg.setVisible(false);
+
+        this.nextBtnText = this.add.text(nextX + nextWidth / 2, nextY + nextHeight / 2, "Próxima Pergunta", {
+            font: "24px Arial",
+            color: "#000000"
+        }).setOrigin(0.5);
+        this.nextBtnText.setVisible(false);
+
+        this.nextBtnBg.on("pointerup", () => this.nextQuestion());
+
+        this.nextBtnBg.on("pointerover", () => {
+            this.nextBtnBg.clear();
+            this.nextBtnBg.fillStyle(0xd1c3c2, 1);
+            this.nextBtnBg.fillRoundedRect(nextX, nextY, nextWidth, nextHeight, 15);
+        });
+
+        this.nextBtnBg.on("pointerout", () => {
+            this.nextBtnBg.clear();
+            this.nextBtnBg.fillStyle(0xffffff, 1);
+            this.nextBtnBg.fillRoundedRect(nextX, nextY, nextWidth, nextHeight, 15);
+        });
     }
 
     showQuestion(index) {
@@ -55,7 +131,7 @@ class gameScene extends Phaser.Scene {
 
         if (question.imageKey) {
             const questionImage = this.add.image(centerX, 230, question.imageKey).setOrigin(0.5);
-            questionImage.setDisplaySize(400, 250);
+            questionImage.setDisplaySize(450, 270);
             this.questionGroup.add(questionImage);
         }
 
@@ -67,7 +143,7 @@ class gameScene extends Phaser.Scene {
             const spacingY = 30;
 
             const startX = centerX - btnWidth - spacingX / 2;
-            const startY = 410;
+            const startY = 450;
 
             const row = Math.floor(i / 2);
             const col = i % 2;
@@ -163,6 +239,32 @@ class gameScene extends Phaser.Scene {
                 questionIndex: this.currentQuestionIndex
             });
         });
+        this.children.bringToTop(this.explanationBtnBg);
+        this.children.bringToTop(this.explanationBtnText);
+        this.children.bringToTop(this.nextBtnBg);
+        this.children.bringToTop(this.nextBtnText);
+    }
+
+    showExplanation(question) {
+        const modal = document.getElementById('explanationModal');
+        const explanationText = document.getElementById('explanationText');
+        const videoLink = document.getElementById('videoLink');
+        const closeBtn = document.getElementById('closeModal');
+
+        explanationText.textContent = `Explicação: ${question.explanation}`;
+
+        if (question.videoUrl) {
+            videoLink.href = question.videoUrl;
+            videoLink.style.display = 'inline';
+        } else {
+            videoLink.style.display = 'none';
+        }
+
+        modal.style.display = 'flex';
+
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
     }
 
     showCorrectAnswer(btnBg) {
@@ -176,9 +278,10 @@ class gameScene extends Phaser.Scene {
             }
         });
 
-        this.time.delayedCall(1000, () => {
-            this.nextQuestion();
-        });
+        this.explanationBtnBg.setVisible(true);
+        this.explanationBtnText.setVisible(true);
+        this.nextBtnText.setVisible(true);
+        this.nextBtnBg.setVisible(true);
     }
 
     showWrongAnswer(btnBg) {
@@ -200,13 +303,19 @@ class gameScene extends Phaser.Scene {
             }
         });
 
-        this.time.delayedCall(1000, () => {
-            this.nextQuestion();
-        });
+        this.explanationBtnBg.setVisible(true);
+        this.explanationBtnText.setVisible(true);
+        this.nextBtnText.setVisible(true);
+        this.nextBtnBg.setVisible(true);
     }
 
     nextQuestion() {
         this.currentQuestionIndex++;
+
+        this.explanationBtnBg.setVisible(false);
+        this.explanationBtnText.setVisible(false);
+        this.nextBtnBg.setVisible(false);
+        this.nextBtnText.setVisible(false);
 
         fetch("http://localhost:3000/saveProgressWithQuestion", {
             method: "POST",
@@ -238,7 +347,7 @@ class gameScene extends Phaser.Scene {
                         id: this.userId,
                         fase: this.atualPhase,
                         pontuacao: this.score,
-                        perguntas_index: 0 
+                        perguntas_index: 0
                     })
                 }).then(() => {
                     this.scene.start("pontuacaoScene", {

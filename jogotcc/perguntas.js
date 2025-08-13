@@ -10,7 +10,9 @@ const phases = [
           { text: "Verde", correct: false },
           { text: "Vermelho", correct: false },
           { text: "Amarelo", correct: false },
-        ]
+        ],
+        explanation: "O céu parece azul devido à dispersão da luz pelo ar.",
+        videoUrl: "https://www.youtube.com/watch?v=p45za0bQLio"
       },
       {
         text: "Qual é este animal?",
@@ -20,7 +22,8 @@ const phases = [
           { text: "Pogona", correct: true },
           { text: "Gato", correct: false },
           { text: "Lobo", correct: false },
-        ]
+        ],
+        explanation: "uma pogona é um reptil",
       },
       {
         text: "Quantos planetas tem o sistema solar?",
@@ -30,7 +33,9 @@ const phases = [
           { text: "8", correct: true },
           { text: "9", correct: false },
           { text: "10", correct: false },
-        ]
+        ],
+         explanation: "tem varios planeta.",
+        videoUrl: "https://www.youtube.com/watch?v=9NVYw1vg5GQ"
       }
     ]
   },
