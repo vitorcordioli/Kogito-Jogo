@@ -16,13 +16,13 @@ class pauseScene extends Phaser.Scene {
         let currentY = 100;
 
         this.add.text(centerX, currentY, "Jogo pausado", {
-            font: "38px Arial",
+            font: "68px 'League Spartan'",
             fill: "#ffffff"
         }).setOrigin(0.5);
 
-        currentY += 100;
+        currentY += 140;
 
-        const options = ["Continuar", "Menu & Salvar", "Menu sem salvar"];
+        const options = ["Continuar", "Menu & Salvar", "Apagar Progresso"];
         const spacing = 70;
 
         options.forEach((option, index) => {
@@ -89,7 +89,7 @@ class pauseScene extends Phaser.Scene {
                         .catch(() => {
                             alert("Erro de conexão com o servidor.");
                         });
-                } else if (option === "Menu sem salvar") {
+                } else if (option === "Apagar Progresso") {
                     const sair = confirm("Se continuar, todo seu progresso será apagado. Tem certeza que quer fazer isso?");
                     if (sair) {
                         const token = localStorage.getItem("token");

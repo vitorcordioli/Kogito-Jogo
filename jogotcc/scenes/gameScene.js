@@ -210,7 +210,6 @@ class gameScene extends Phaser.Scene {
         const pauseBar1 = this.add.rectangle(bar1X, barY, barWidth, barHeight, 0x000000).setOrigin(0, 0);
         const pauseBar2 = this.add.rectangle(bar2X, barY, barWidth, barHeight, 0x000000).setOrigin(0, 0);
 
-        // === Eventos de hover ===
         pauseBtn.on("pointerover", () => {
             pauseBtn.clear();
             pauseBtn.fillStyle(0xd1c3c2, 1);
