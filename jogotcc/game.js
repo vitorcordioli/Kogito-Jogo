@@ -6,7 +6,7 @@ const config = {
   dom: {
     createContainer: true
   },
-  scene: [carregarScene, menuScene, gameScene, pontuacaoScene, loginScene, registroScene, pauseScene]
+  scene: [carregarScene, menuScene, gameScene, pontuacaoScene, loginScene, registroScene, pauseScene, opcoesScene],
 };
 
 const game = new Phaser.Game(config);

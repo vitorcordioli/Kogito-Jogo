@@ -6,11 +6,25 @@ const { body, validationResult } = require('express-validator');
 require('dotenv').config({ path: '../.env' });
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "img-src": ["'self'", "data:", "blob:"],
+    }
+  }
+}));
+
+app.use(express.static(path.join(__dirname, '../')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../index.html'));
+});
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,

@@ -117,6 +117,12 @@ class menuScene extends Phaser.Scene {
                         alert("Você ainda não tem progresso salvo.");
                     }
                 }
+
+                if (option === "Opções") {
+                    this.scene.start("opcoesScene", {
+                        
+                    });
+                }
             });
 
             bg.on("pointerover", () => {
