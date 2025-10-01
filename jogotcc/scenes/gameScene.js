@@ -11,6 +11,10 @@ class gameScene extends Phaser.Scene {
     }
 
     create(data) {
+        if (!this.registry.has("fontBase")) this.registry.set("fontBase", 20);
+        if (!this.registry.has("tituloFont")) this.registry.set("tituloFont", "League Spartan");
+        if (!this.registry.has("opcaoFont")) this.registry.set("opcaoFont", "Arial");
+
         this.userId = data.userId;
         this.atualPhase = data?.atualPhase || 0;
         this.score = data?.score || 0;
@@ -41,9 +45,8 @@ class gameScene extends Phaser.Scene {
         this.explanationBtnBg.input.cursor = 'pointer';
         this.explanationBtnBg.setVisible(false);
 
-        this.explanationBtnText = this.add.text(verExpX + verExpWidth / 2, verExpY + verExpHeight / 2, "Ver Explicação", {
-            font: "24px Arial",
-            color: "#000000"
+        this.explanationBtnText = createText(this, verExpX + verExpWidth / 2, verExpY + verExpHeight / 2, "Ver Explicação", "normal", {
+            fontFamily: this.registry.get("opcaoFont"),
         }).setOrigin(0.5);
         this.explanationBtnText.setVisible(false);
 
@@ -77,9 +80,8 @@ class gameScene extends Phaser.Scene {
         this.nextBtnBg.input.cursor = 'pointer';
         this.nextBtnBg.setVisible(false);
 
-        this.nextBtnText = this.add.text(nextX + nextWidth / 2, nextY + nextHeight / 2, "Próxima Pergunta", {
-            font: "24px Arial",
-            color: "#000000"
+        this.nextBtnText = createText(this, nextX + nextWidth / 2, nextY + nextHeight / 2, "Próxima Pergunta", "normal", {
+            fontFamily: this.registry.get("opcaoFont"),
         }).setOrigin(0.5);
         this.nextBtnText.setVisible(false);
 
@@ -121,10 +123,8 @@ class gameScene extends Phaser.Scene {
 
         const centerX = this.scale.width / 2;
 
-        const questionText = this.add.text(centerX, 50, question.text, {
-            font: "32px Arial",
-            fill: "#ffffff",
-            wordWrap: { width: this.scale.width - 40 }
+        const questionText = createText(this, centerX, 50, question.text, "destaque", {
+            fontFamily: this.registry.get("opcaoFont"),
         }).setOrigin(0.5);
 
         this.questionGroup.add(questionText);
@@ -157,9 +157,8 @@ class gameScene extends Phaser.Scene {
             btnBg.setInteractive(new Phaser.Geom.Rectangle(btnX, btnY, btnWidth, btnHeight), Phaser.Geom.Rectangle.Contains);
             btnBg.input.cursor = 'pointer';
 
-            const btnText = this.add.text(btnX + btnWidth / 2, btnY + btnHeight / 2, answer.text, {
-                font: "24px Arial",
-                color: "#000000"
+            const btnText = createText(this, btnX + btnWidth / 2, btnY + btnHeight / 2, answer.text, "normal", {
+                fontFamily: this.registry.get("opcaoFont"),
             }).setOrigin(0.5);
 
             this.questionGroup.addMultiple([btnBg, btnText]);

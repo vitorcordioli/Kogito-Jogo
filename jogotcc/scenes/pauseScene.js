@@ -4,6 +4,10 @@ class pauseScene extends Phaser.Scene {
     }
 
     create(data) {
+        if (!this.registry.has("fontBase")) this.registry.set("fontBase", 20);
+        if (!this.registry.has("tituloFont")) this.registry.set("tituloFont", "League Spartan");
+        if (!this.registry.has("opcaoFont")) this.registry.set("opcaoFont", "Arial");
+
         this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
         this.bg3.setDisplaySize(this.scale.width, this.scale.height);
 
@@ -15,9 +19,9 @@ class pauseScene extends Phaser.Scene {
         const centerX = this.scale.width / 2;
         let currentY = 100;
 
-        this.add.text(centerX, currentY, "Jogo pausado", {
-            font: "68px 'League Spartan'",
-            fill: "#ffffff"
+        createText(this, centerX, currentY, "Jogo pausado", "titulo",{
+            fontFamily: this.registry.get("tituloFont"),
+            color: "#ffffff"
         }).setOrigin(0.5);
 
         currentY += 140;
@@ -38,9 +42,8 @@ class pauseScene extends Phaser.Scene {
             );
             bg.input.cursor = 'pointer';
 
-            const label = this.add.text(centerX, y, option, {
-                font: "28px Arial",
-                color: "#000000"
+            const label = createText(this, centerX, y, option, "subtitulo",{
+                fontFamily: this.registry.get("opcaoFont"),
             }).setOrigin(0.5);
 
             bg.on("pointerup", () => {

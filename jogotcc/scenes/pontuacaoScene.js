@@ -4,6 +4,10 @@ class pontuacaoScene extends Phaser.Scene {
   }
 
   create(data) {
+    if (!this.registry.has("fontBase")) this.registry.set("fontBase", 20);
+    if (!this.registry.has("tituloFont")) this.registry.set("tituloFont", "League Spartan");
+    if (!this.registry.has("opcaoFont")) this.registry.set("opcaoFont", "Arial");
+
     this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
     this.bg3.setDisplaySize(this.scale.width, this.scale.height);
 
@@ -40,9 +44,9 @@ class pontuacaoScene extends Phaser.Scene {
         console.error("Erro na requisição automática:", err);
       });
 
-    this.add.text(centerX, currentY, `Você concluiu a fase ${this.atualPhase + 1}!`, {
-      font: "38px Arial",
-      fill: "#ffffff"
+    createText(this, centerX, currentY, `Você concluiu a fase ${this.atualPhase + 1}!`, "pontuacao",{
+      fontFamily: this.registry.get("opcaoFont"),
+      color: "#ffffff"
     }).setOrigin(0.5);
 
     currentY += 120;
@@ -51,9 +55,8 @@ class pontuacaoScene extends Phaser.Scene {
       .fillStyle(0xffffff, 1)
       .fillRoundedRect(centerX - 220, currentY - 30, 440, 140, 15);
 
-    this.add.text(centerX, currentY, "Pontuação final:", {
-      font: "34px Arial",
-      color: "#000000",
+    createText(this, centerX, currentY, "Pontuação final:", "destaque", {
+      fontFamily: this.registry.get("opcaoFont"),
       fontStyle: "bold"
     }).setOrigin(0.5);
 
@@ -63,9 +66,8 @@ class pontuacaoScene extends Phaser.Scene {
     scoreBg.fillStyle(0xbcb7b7, 1);
     scoreBg.fillRoundedRect(centerX - 150, currentY, 300, 50, 25);
 
-    this.add.text(centerX, currentY + 25, this.score.toString(), {
-      font: "30px Arial",
-      color: "#000000",
+    createText(this, centerX, currentY + 25, this.score.toString(), "subtitulo", {
+      fontFamily: this.registry.get("opcaoFont"),
       fontStyle: "bold"
     }).setOrigin(0.5);
 
@@ -89,9 +91,8 @@ class pontuacaoScene extends Phaser.Scene {
       );
       bg.input.cursor = 'pointer';
 
-      const scoreText = this.add.text(centerX, y, option, {
-        font: "28px Arial",
-        color: "#000000"
+      const scoreText = createText(this, centerX, y, option, "subtitulo", {
+        fontFamily: this.registry.get("opcaoFont"),
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
       scoreText.setInteractive({ pixelPerfect: false });

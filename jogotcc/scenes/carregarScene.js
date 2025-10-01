@@ -14,6 +14,7 @@ class carregarScene extends Phaser.Scene {
     this.bg3.setDisplaySize(this.scale.width, this.scale.height);
 
     //MUDAR PARA A LOGINSCENE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    this.registry.set("fontBase", 20);
     this.scene.start("loginScene");
   }
 
