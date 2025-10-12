@@ -124,7 +124,11 @@ class menuScene extends Phaser.Scene {
 
                 if (option === "Opções") {
                     this.scene.start("opcoesScene", {
+                    });
+                }
 
+                if (option === "Créditos") {
+                    this.scene.start("creditosScene", {
                     });
                 }
             });

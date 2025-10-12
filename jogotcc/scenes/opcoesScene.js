@@ -14,7 +14,7 @@ class opcoesScene extends Phaser.Scene {
         };
 
         const minBase = 14;
-        const maxBase = 26;
+        const maxBase = 24;
 
         const safeBase = Math.max(minBase, Math.min(maxBase, base));
 
@@ -87,6 +87,8 @@ class opcoesScene extends Phaser.Scene {
                         
                         this.scene.start('loginScene');
                     }
+                } else if (option === "Como Jogar") {
+                    this.scene.start("comoJogarScene");
                 }
             });
 

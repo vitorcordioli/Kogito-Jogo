@@ -3,6 +3,38 @@ class loginScene extends Phaser.Scene {
         super("loginScene");
     }
 
+    realizarLogin() {
+        const email = this.emailInput.node.querySelector('input').value;
+        const senha = this.passwordInput.node.querySelector('input').value;
+
+        fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Login efetuado com sucesso!');
+
+                    localStorage.setItem('token', data.token);
+
+                    this.scene.start('menuScene', {
+                        userId: data.user.id,
+                        email: data.user.email,
+                        fase: data.user.fase,
+                        pontuacao: data.user.pontuacao,
+                        perguntaIndex: data.user.perguntas_index || 0
+                    });
+                } else {
+                    alert(data.error || 'Email ou senha incorretos');
+                }
+            })
+            .catch(() => {
+                alert('Erro ao conectar com o servidor');
+            });
+    }
+
     create() {
         this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
         this.bg3.setDisplaySize(this.scale.width, this.scale.height);
@@ -91,35 +123,11 @@ class loginScene extends Phaser.Scene {
         menuText.input.hitArea = bg.input.hitArea;
 
         bg.on("pointerup", () => {
-            const email = this.emailInput.node.querySelector('input').value;
-            const senha = this.passwordInput.node.querySelector('input').value;
+            this.realizarLogin();
+        });
 
-            fetch('http://localhost:3000/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, senha })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Login efetuado com sucesso!');
-
-                        localStorage.setItem('token', data.token);
-
-                        this.scene.start('menuScene', {
-                            userId: data.user.id,
-                            email: data.user.email,
-                            fase: data.user.fase,
-                            pontuacao: data.user.pontuacao,
-                            perguntaIndex: data.user.perguntas_index || 0
-                        });
-                    } else {
-                        alert(data.error || 'Email ou senha incorretos');
-                    }
-                })
-                .catch(() => {
-                    alert('Erro ao conectar com o servidor');
-                });
+        this.input.keyboard.on('keydown-ENTER', () => {
+            this.realizarLogin();
         });
 
         bg.on("pointerover", () => {
@@ -159,3 +167,4 @@ class loginScene extends Phaser.Scene {
 
     }
 };
+

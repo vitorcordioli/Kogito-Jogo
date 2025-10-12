@@ -7,7 +7,22 @@ class gameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("pogona", "assets/pogona.jpg");
+        this.load.image("bg1", "assets/bg1.png");
+        this.load.image("bg2", "assets/bg2.png");
+        this.load.image("bg3", "assets/bg3.png");
+        this.load.image("fase21", "assets/fase21.png");
+        this.load.image("fase22", "assets/fase22.png");
+        this.load.image("fase23", "assets/fase23.png");
+        this.load.image("fase24", "assets/fase24.png");
+        this.load.image("fase25", "assets/fase25.png");
+        this.load.image("fasea1", "assets/fasea1.png");
+        this.load.image("fasea2", "assets/fasea2.png");
+        this.load.image("fasea3", "assets/fasea3.png");
+        this.load.image("fasea4", "assets/fasea4.png");
+        this.load.image("faseb1", "assets/faseb1.png");
+        this.load.image("faseb2", "assets/faseb2.png");
+        this.load.image("faseb3", "assets/faseb3.png");
+        this.load.image("faseb4", "assets/faseb4.png");
     }
 
     create(data) {
@@ -137,13 +152,15 @@ class gameScene extends Phaser.Scene {
 
 
         question.answers.forEach((answer, i) => {
-            const btnWidth = 280;
-            const btnHeight = 60;
+            const isFirstPhase = this.atualPhase === 0;
+
+            const btnWidth = isFirstPhase ? 450 : 280;
+            const btnHeight = isFirstPhase ? 80 : 60;
             const spacingX = 40;
             const spacingY = 30;
 
             const startX = centerX - btnWidth - spacingX / 2;
-            const startY = 450;
+            const startY = isFirstPhase ? 400 : 450;
 
             const row = Math.floor(i / 2);
             const col = i % 2;
@@ -157,11 +174,33 @@ class gameScene extends Phaser.Scene {
             btnBg.setInteractive(new Phaser.Geom.Rectangle(btnX, btnY, btnWidth, btnHeight), Phaser.Geom.Rectangle.Contains);
             btnBg.input.cursor = 'pointer';
 
-            const btnText = createText(this, btnX + btnWidth / 2, btnY + btnHeight / 2, answer.text, "normal", {
-                fontFamily: this.registry.get("opcaoFont"),
-            }).setOrigin(0.5);
+            let content;
+            if (answer.imageKey) {
+                const imgSize = btnHeight - 10;
+                content = this.add.image(btnX + btnWidth / 2, btnY + btnHeight / 2, answer.imageKey)
+                    .setOrigin(0.5)
+                    .setDisplaySize(imgSize, imgSize);
 
-            this.questionGroup.addMultiple([btnBg, btnText]);
+                const maskShape = this.make.graphics({ x: 0, y: 0, add: false });
+                maskShape.fillStyle(0xffffff);
+                maskShape.fillRoundedRect(
+                    btnX + btnWidth / 2 - imgSize / 2,
+                    btnY + btnHeight / 2 - imgSize / 2,
+                    imgSize,
+                    imgSize,
+                    8
+                );
+                const mask = maskShape.createGeometryMask();
+                content.setMask(mask);
+            } else {
+                content = createText(this, btnX + btnWidth / 2, btnY + btnHeight / 2, answer.text, "normal", {
+                    fontFamily: this.registry.get("opcaoFont"),
+                    wordWrap: isFirstPhase ? { width: btnWidth - 10 } : undefined,
+                    align: 'center',
+                }).setOrigin(0.5);
+            }
+
+            this.questionGroup.addMultiple([btnBg, content]);
 
             btnBg.on("pointerup", () => {
                 if (answer.correct) {
@@ -268,7 +307,7 @@ class gameScene extends Phaser.Scene {
     showCorrectAnswer(btnBg) {
         btnBg.clear();
         btnBg.fillStyle(0x81CD24, 1);
-        btnBg.fillRoundedRect(btnBg.input.hitArea.x, btnBg.input.hitArea.y, 280, 60, 15);
+        btnBg.fillRoundedRect(btnBg.input.hitArea.x, btnBg.input.hitArea.y, btnBg.input.hitArea.width, btnBg.input.hitArea.height, 15);
 
         this.questionGroup.getChildren().forEach(child => {
             if (child.input) {
@@ -285,7 +324,7 @@ class gameScene extends Phaser.Scene {
     showWrongAnswer(btnBg) {
         btnBg.clear();
         btnBg.fillStyle(0xD14224, 1);
-        btnBg.fillRoundedRect(btnBg.input.hitArea.x, btnBg.input.hitArea.y, 280, 60, 15);
+        btnBg.fillRoundedRect(btnBg.input.hitArea.x, btnBg.input.hitArea.y,  btnBg.input.hitArea.width, btnBg.input.hitArea.height, 15);
 
         const correctIndex = this.questions[this.currentQuestionIndex].answers.findIndex(a => a.correct);
         const graphicsList = this.questionGroup.getChildren().filter(c => c instanceof Phaser.GameObjects.Graphics);
@@ -293,7 +332,7 @@ class gameScene extends Phaser.Scene {
 
         correctBtnBg.clear();
         correctBtnBg.fillStyle(0x81CD24, 1);
-        correctBtnBg.fillRoundedRect(correctBtnBg.input.hitArea.x, correctBtnBg.input.hitArea.y, 280, 60, 15);
+        correctBtnBg.fillRoundedRect(correctBtnBg.input.hitArea.x, correctBtnBg.input.hitArea.y, correctBtnBg.input.hitArea.width, correctBtnBg.input.hitArea.height, 15);
 
         this.questionGroup.getChildren().forEach(child => {
             if (child.input) {

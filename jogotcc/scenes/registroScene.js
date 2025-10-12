@@ -3,6 +3,55 @@ class registroScene extends Phaser.Scene {
         super("registroScene");
     }
 
+    realizarCadastro() {
+        const email = this.emailInput.node.querySelector("input").value;
+        const senha = this.passwordInput.node.querySelector("input").value;
+        const confirmSenha = this.confirmPasswordInput.node.querySelector("input").value;
+
+        if (senha !== confirmSenha) {
+            alert("As senhas não coincidem!");
+            return;
+        }
+
+        fetch('http://localhost:3000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Usuário registrado com sucesso!');
+
+                    return fetch('http://localhost:3000/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, senha })
+                    });
+                } else {
+                    throw new Error(data.error || 'Erro ao registrar');
+                }
+            })
+            .then(res => res.json())
+            .then(loginData => {
+                if (loginData.success) {
+                    localStorage.setItem('token', loginData.token);
+
+                    this.scene.start('menuScene', {
+                        userId: loginData.user.id,
+                        email: loginData.user.email,
+                        fase: loginData.user.fase,
+                        pontuacao: loginData.user.pontuacao
+                    });
+                } else {
+                    alert('Erro ao logar após o registro');
+                }
+            })
+            .catch(() => {
+                alert('Erro ao conectar com o servidor');
+            });
+    };
+
     create() {
         this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
         this.bg3.setDisplaySize(this.scale.width, this.scale.height);
@@ -138,52 +187,11 @@ class registroScene extends Phaser.Scene {
         menuText.input.hitArea = bg.input.hitArea;
 
         bg.on("pointerup", () => {
-            const email = this.emailInput.node.querySelector("input").value;
-            const senha = this.passwordInput.node.querySelector("input").value;
-            const confirmSenha = this.confirmPasswordInput.node.querySelector("input").value;
+            this.realizarCadastro();
+        });
 
-            if (senha !== confirmSenha) {
-                alert("As senhas não coincidem!");
-                return;
-            }
-
-            fetch('http://localhost:3000/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, senha })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Usuário registrado com sucesso!');
-
-                        return fetch('http://localhost:3000/login', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email, senha })
-                        });
-                    } else {
-                        throw new Error(data.error || 'Erro ao registrar');
-                    }
-                })
-                .then(res => res.json())
-                .then(loginData => {
-                    if (loginData.success) {
-                        localStorage.setItem('token', loginData.token);
-
-                        this.scene.start('menuScene', {
-                            userId: loginData.user.id,
-                            email: loginData.user.email,
-                            fase: loginData.user.fase,
-                            pontuacao: loginData.user.pontuacao
-                        });
-                    } else {
-                        alert('Erro ao logar após o registro');
-                    }
-                })
-                .catch(() => {
-                    alert('Erro ao conectar com o servidor');
-                });
+        this.input.keyboard.on('keydown-ENTER', () => {
+            this.realizarCadastro();
         });
 
         bg.on("pointerover", () => {
