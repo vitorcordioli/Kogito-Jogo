@@ -16,10 +16,10 @@ class comoJogarScene extends Phaser.Scene {
 
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
-        
-        const titulo = createText(this, centerX, 100, "Como Jogar", "titulo", { fontFamily: this.registry.get("tituloFont"), color: "#ffffff" }).setOrigin(0.5);
-        
-        const tituloY = 100; 
+
+        const titulo = createText(this, centerX, 90, "Como Jogar", "titulo", { fontFamily: this.registry.get("tituloFont"), color: "#ffffff" }).setOrigin(0.5);
+
+        const tituloY = 100;
         const spacing = 50;
 
         const img = this.add.image(centerX, tituloY + spacing, "comoJogar");
@@ -27,6 +27,31 @@ class comoJogarScene extends Phaser.Scene {
 
         const scale = (this.scale.width * 0.75) / img.width;
         img.setScale(scale);
+        
+        const imgWidth = img.displayWidth;
+        const imgHeight = img.displayHeight;
+
+        const maskShape = this.make.graphics({ x: 0, y: 0, add: false });
+        maskShape.fillStyle(0xffffff);
+        maskShape.fillRoundedRect(
+            centerX - imgWidth / 2,
+            tituloY + spacing,
+            imgWidth,
+            imgHeight,
+            20 
+        );
+        const mask = maskShape.createGeometryMask();
+        img.setMask(mask);
+
+        const border = this.add.graphics();
+        border.lineStyle(6, 0x000000);
+        border.strokeRoundedRect(
+            centerX - imgWidth / 2,
+            tituloY + spacing,
+            imgWidth,
+            imgHeight,
+            20 
+        );
 
         const backBtnX = 40;
         const backBtnY = 40;

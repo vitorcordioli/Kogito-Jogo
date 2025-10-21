@@ -23,6 +23,11 @@ class gameScene extends Phaser.Scene {
         this.load.image("faseb2", "assets/faseb2.png");
         this.load.image("faseb3", "assets/faseb3.png");
         this.load.image("faseb4", "assets/faseb4.png");
+        this.load.image("q1", "assets/q1.png");
+        this.load.image("q2", "assets/q2.png");
+        this.load.image("q3", "assets/q3.jpg");
+        this.load.image("q4", "assets/q4.png");
+        this.load.image("q5", "assets/q5.png");
     }
 
     create(data) {
@@ -140,6 +145,7 @@ class gameScene extends Phaser.Scene {
 
         const questionText = createText(this, centerX, 50, question.text, "destaque", {
             fontFamily: this.registry.get("opcaoFont"),
+            color: "#ffffff",
         }).setOrigin(0.5);
 
         this.questionGroup.add(questionText);
@@ -149,7 +155,6 @@ class gameScene extends Phaser.Scene {
             questionImage.setDisplaySize(450, 270);
             this.questionGroup.add(questionImage);
         }
-
 
         question.answers.forEach((answer, i) => {
             const isFirstPhase = this.atualPhase === 0;
@@ -288,7 +293,12 @@ class gameScene extends Phaser.Scene {
         const videoLink = document.getElementById('videoLink');
         const closeBtn = document.getElementById('closeModal');
 
-        explanationText.textContent = `Explicação: ${question.explanation}`;
+        if (question.explanation) {
+            explanationText.textContent = `Explicação: ${question.explanation}`;
+            explanationText.style.display = 'block';
+        } else {
+            explanationText.style.display = 'none';
+        }
 
         if (question.videoUrl) {
             videoLink.href = question.videoUrl;
@@ -324,7 +334,7 @@ class gameScene extends Phaser.Scene {
     showWrongAnswer(btnBg) {
         btnBg.clear();
         btnBg.fillStyle(0xD14224, 1);
-        btnBg.fillRoundedRect(btnBg.input.hitArea.x, btnBg.input.hitArea.y,  btnBg.input.hitArea.width, btnBg.input.hitArea.height, 15);
+        btnBg.fillRoundedRect(btnBg.input.hitArea.x, btnBg.input.hitArea.y, btnBg.input.hitArea.width, btnBg.input.hitArea.height, 15);
 
         const correctIndex = this.questions[this.currentQuestionIndex].answers.findIndex(a => a.correct);
         const graphicsList = this.questionGroup.getChildren().filter(c => c instanceof Phaser.GameObjects.Graphics);
