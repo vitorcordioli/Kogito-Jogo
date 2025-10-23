@@ -3,7 +3,7 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: './.env' });
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -57,7 +57,7 @@ function autenticarToken(req, res, next) {
 
 app.post('/register',
   [
-    body('email').isEmail(),
+    body('email').isEmail().withMessage('Email inválido'),
     body('senha').isLength({ min: 6 })
   ],
   async (req, res) => {
