@@ -43,15 +43,15 @@ const phases = [
         imageKey: null,
         answers: [
           { text: "São a mesma coisa", imageKey: null, correct: false },
-          { text: " A linguagem vem antes da lógica ", imageKey: null, correct: false },
-          { text: " A linguagem é mais importante que a lógica", imageKey: null, correct: false },
+          { text: "O algoritmo vem antes da lógica ", imageKey: null, correct: false },
+          { text: "O algoritmo é mais importante que a lógica", imageKey: null, correct: false },
           { text: "Primeiro pensamos na solução, depois digitamos", imageKey: null, correct: true },
         ],
         explanation: "Primeiro, use lógica: pense no plano, como vou fazer assim. É o cérebro trabalhando. Depois, use a linguagem: escreva o plano no computador, como uma receita escrita. Lógica vem antes. É mais importante. Não são a mesma coisa.",
         videoUrl: "https://www.youtube.com/watch?v=sxt_3lcu3Hs",
       },
       {
-        text: " Para que usamos a programação?",
+        text: "Para que usamos a programação?",
         imageKey: null,
         answers: [
           { text: "Para criar jogos e aplicativos que resolvem problemas", imageKey: null, correct: true },
@@ -100,8 +100,8 @@ const phases = [
           { text: "Roxo", imageKey: null, correct: false },
           { text: "Azul", imageKey: null, correct: false },
         ],
-        explanation: null,
-        videoUrl: "https://youtu.be/Jq69s-GxzT4",
+        explanation: "Se cinza ganha cor vermelha, vermelho ganha cor a cinza. Elas trocam! Agora, se amarelo ganha cor roxa, roxa ganha a cor amarela.",
+        videoUrl: "https://youtu.be/mWQGaHalYDk",
       },
       {
         text: "Com qual cor será preenchida a palavra vermelho?",
@@ -112,11 +112,11 @@ const phases = [
           { text: "Rosa", imageKey: null, correct: true },
           { text: "Cinza", imageKey: null, correct: false },
         ],
-        explanation: null,
-        videoUrl: "https://youtu.be/Jq69s-GxzT4",
+        explanation: "Se verde ganha cor azul, azul ganha a cor verde. Elas trocam! Agora, se rosa ganha cor vermelha, vermelho ganha a cor rosa.",
+        videoUrl: "https://youtu.be/mWQGaHalYDk",
       },
       {
-        text: "Subtraindo o numero de lados das formas geométricas, qual será o resultado?",
+        text: "Subtraindo o número de lados das formas, qual o resultado?",
         imageKey: "fase25",
         answers: [
           { text: "1", imageKey: null, correct: false },
@@ -124,8 +124,8 @@ const phases = [
           { text: "3", imageKey: null, correct: true },
           { text: "15", imageKey: null, correct: false },
         ],
-        explanation: null,
-        videoUrl: "https://youtu.be/Jq69s-GxzT4",
+        explanation: "Quadrado tem 4 lados, triângulo tem 3. 4 - 3 = 1. Agora, hexágono tem 6 lados, triângulo tem 3. 6 - 3 = 3. Simples: conte os lados e subtraia!",
+        videoUrl: "https://youtu.be/RtU4LmcZ36c",
       },
     ]
   },
@@ -133,7 +133,7 @@ const phases = [
     name: "Phase 3",
     questions: [
       {
-        text: "Qual o resultado da soma das variáveis?",
+        text: "Qual o resultado da soma das frutas (maçã + laranja)?",
         imageKey: "q1",
         answers: [
           { text: "7", imageKey: null, correct: true },
@@ -141,10 +141,10 @@ const phases = [
           { text: "4", imageKey: null, correct: false },
           { text: "8", imageKey: null, correct: false },
         ],
-        explanation: "A maçã vale 4 (4 + 4 = 8) e o cachorro vale 3 (3 + 3 = 6), logo o resultado é 7",
+        explanation: " Cada maçã vale 4. Cada laranja vale 3, então se somarmos 1 laranja (vale 3) + 1 maçã (vale 4) o resultado é 7 (3 + 4 = 7).",
       },
        {
-        text: "Qual o resultado da soma das variáveis?",
+        text: "Qual o resultado da soma das construções (casa + prédio)?",
         imageKey: "q2",
         answers: [
           { text: "12", imageKey: null, correct: false },
@@ -152,33 +152,33 @@ const phases = [
           { text: "15", imageKey: null, correct: true },
           { text: "9", imageKey: null, correct: false },
         ],
-        explanation: "A casa vale 9 (9 + 9 = 18) e o prédio vale 6 (6 +6 = 12), logo o resultado é 15",
+        explanation: "Cada casa vale 9. Cada prédio vale 6, então se somarmos 1 casa (vale 9) + 1 prédio (vale 6) o resultado é 15 (9 + 6 = 15).",
       },
          {
-        text: "Que o resultado da subtração?",
+        text: "Qual o resultado da subtração dos animais (cachorro - gato)?",
         imageKey: "q3",
         answers: [
-          { text: "5", imageKey: null, correct: false },
+          { text: "12", imageKey: null, correct: false },
           { text: "14", imageKey: null, correct: false },
           { text: "37", imageKey: null, correct: false },
           { text: "2", imageKey: null, correct: true },
         ],
-        explanation: "O gato vale 5 (5 + 5 = 10) e o cachorro vale 7 (7 + 7 = 14), logo o resultado da subtração é 2",
+        explanation: "Cada gato vale 5. Cada cachorro vale 7, então se subtrairmos 1 cachorro (vale 7) - 1 gato (vale 5) o resultado é 2 (7 - 5 = 2).",
       },
         {
-        text: "Qual o resultado da soma das variáveis?",
+        text: "Qual o resultado da multiplicação (ônibus x carro )?",
         imageKey: "q4",
         answers: [
           { text: "14", imageKey: null, correct: false },
           { text: "5", imageKey: null, correct: false },
           { text: "29", imageKey: null, correct: false },
-           { text: "11", imageKey: null, correct: true },
+           { text: "12", imageKey: null, correct: true },
         ],
-        explanation: "O ônibus vale 6 (6 * 6= 36) e o carro vale 5 (5 * 5 = 25), logo o resultado é 11",
+        explanation: "Cada ônibus vale 3. Cada carro vale 4, então se multiplicarmos 1 ônibus (vale 6) X 1 carro (vale 5) o resultado é  12(4 X 3 = 12).",
       },
      
         {
-        text: "Qual o resultado da soma das variáveis?",
+        text: "Qual o resultado da divisão (pote de ouro ÷ doende)?",
         imageKey: "q5",
         answers: [
           { text: "43", imageKey: null, correct: false },
@@ -186,7 +186,7 @@ const phases = [
           { text: "5", imageKey: null, correct: true },
           { text: "2", imageKey: null, correct: false },
         ],
-        explanation: "O doende vale 2 (2 + 2 = 4) e o pote de ouro vale 10 (10 + 10 = 20), logo o resultado da divisão das variáveis é 5",
+        explanation: "Cada pote de ouro vale 10. Cada doende vale 2, então se dividirmos 1 pote de ouro (vale 10) ÷ 1 doende (vale 2) o resultado é  5 (10 ÷ 2 = 5).",
       },
    
     ]

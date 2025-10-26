@@ -3,6 +3,7 @@ function createText(scene, x, y, content, styleName = "normal", extraConfig = {}
 
     const styles = {
         titulo: 3.4,     // 20 * 3.4 = ~68px
+        fim: 2.6,        // 20 * 2.6 = ~52px
         pontuacao: 1.9, // 20 * 1.9 = ~38px
         destaque: 1.6,  // 20 * 1.6 = ~32px
         subtitulo: 1.4,  // 20 * 1.4 = ~28px
@@ -29,7 +30,7 @@ const config = {
   dom: {
     createContainer: true
   },
-  scene: [carregarScene, menuScene, gameScene, pontuacaoScene, loginScene, registroScene, pauseScene, opcoesScene, creditosScene, comoJogarScene],
+  scene: [carregarScene, menuScene, gameScene, pontuacaoScene, loginScene, registroScene, pauseScene, opcoesScene, creditosScene, comoJogarScene, fimScene],
 };
 
 const game = new Phaser.Game(config);

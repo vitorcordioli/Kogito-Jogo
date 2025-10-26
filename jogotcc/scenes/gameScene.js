@@ -26,8 +26,8 @@ class gameScene extends Phaser.Scene {
         this.load.image("q1", "assets/q1.png");
         this.load.image("q2", "assets/q2.png");
         this.load.image("q3", "assets/q3.jpg");
-        this.load.image("q4", "assets/q4.png");
-        this.load.image("q5", "assets/q5.png");
+        this.load.image("q4", "assets/q4.jpg");
+        this.load.image("q5", "assets/q5.jpg");
     }
 
     create(data) {
@@ -44,7 +44,12 @@ class gameScene extends Phaser.Scene {
         this.questions = phases[this.atualPhase].questions;
         this.questionGroup = this.add.group();
         this.createPersistentButtons();
-
+        
+        if (this.currentQuestionIndex >= this.questions.length) {
+            console.warn("Índice de pergunta inválido, nenhum progresso salvo.");
+            this.currentQuestionIndex = 0;
+        }
+        
         this.showQuestion(this.currentQuestionIndex);
 
         document.getElementById("closeModal").onclick = function () {
@@ -413,8 +418,11 @@ class gameScene extends Phaser.Scene {
                     });
                 });
             } else {
-                console.log("Fim do jogo!");
-                //INCOMPLETO
+                this.scene.start("fimScene", {
+                    score: this.score,
+                    atualPhase: this.atualPhase - 1,
+                    userId: this.userId
+                });
             }
         }
     }

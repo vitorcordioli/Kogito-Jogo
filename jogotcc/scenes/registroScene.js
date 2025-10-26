@@ -8,6 +8,18 @@ class registroScene extends Phaser.Scene {
         const senha = this.passwordInput.node.querySelector("input").value;
         const confirmSenha = this.confirmPasswordInput.node.querySelector("input").value;
 
+        if (!email) {
+            alert("Por favor, digite um email.");
+            return;
+        }
+        if (!senha) {
+            alert("Por favor, digite uma senha.");
+            return;
+        }
+        if (senha.length < 6) {
+            alert("A senha deve ter no mínimo 6 caracteres.");
+            return;
+        }
         if (senha !== confirmSenha) {
             alert("As senhas não coincidem!");
             return;
@@ -18,39 +30,49 @@ class registroScene extends Phaser.Scene {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Usuário registrado com sucesso!');
-
-                    return fetch('http://localhost:3000/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, senha })
-                    });
-                } else {
-                    throw new Error(data.error || 'Erro ao registrar');
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(({ status, body }) => {
+                if (status !== 200) {
+                    if (body.errors && body.errors.length > 0) {
+                        alert(body.errors.map(e => e.msg).join("\n"));
+                    } else if (body.error) {
+                        alert(body.error);
+                    } else {
+                        alert("Erro desconhecido ao registrar.");
+                    }
+                    throw new Error("Erro no registro");
                 }
-            })
-            .then(res => res.json())
-            .then(loginData => {
-                if (loginData.success) {
-                    localStorage.setItem('token', loginData.token);
 
-                    this.scene.start('menuScene', {
-                        userId: loginData.user.id,
-                        email: loginData.user.email,
-                        fase: loginData.user.fase,
-                        pontuacao: loginData.user.pontuacao
-                    });
-                } else {
-                    alert('Erro ao logar após o registro');
-                }
+                return (
+                    alert('Usuário cadastrado com sucesso!'),
+                    fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                }));
             })
-            .catch(() => {
-                alert('Erro ao conectar com o servidor');
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(({ status, body }) => {
+                if (status !== 200 || !body.success) {
+                    alert(body.error || "Erro ao logar após registro");
+                    throw new Error("Erro no login");
+                }
+
+                localStorage.setItem('token', body.token);
+                this.scene.start('menuScene', {
+                    userId: body.user.id,
+                    email: body.user.email,
+                    fase: body.user.fase,
+                    pontuacao: body.user.pontuacao
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                if (err.message === "Failed to fetch") {
+                    alert("Não foi possível conectar ao servidor.");
+                }
             });
-    };
+    }
 
     create() {
         this.bg3 = this.add.image(0, 0, "bg3").setOrigin(0);
