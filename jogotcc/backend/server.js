@@ -3,7 +3,9 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
-require('dotenv').config({ path: './.env' });
+require('dotenv').config({
+  path: require('path').join(__dirname, '.env')
+});
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -33,14 +35,14 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
-  db.connect(err => {
-    if (err) {
-      console.error('Erro ao conectar:', err);
-    } else {
-      console.log('Conectado ao MySQL!');
-      console.log("Banco conectado:", process.env.DB_NAME);
-    }
-  });
+db.connect(err => {
+  if (err) {
+    console.error('Erro ao conectar:', err);
+  } else {
+    console.log('Conectado ao MySQL!');
+    console.log("Banco conectado:", process.env.DB_NAME);
+  }
+});
 
 function autenticarToken(req, res, next) {
   const authHeader = req.headers['authorization'];
