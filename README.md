@@ -50,6 +50,7 @@ O servidor estará disponível em `http://localhost:3000`
 
 - **Runtime:** Node.js
 - **Framework:** Express.js
+- **Game Framework:** Phaser 3
 - **Banco de dados:** MySQL
 - **Autenticação:** JWT + bcrypt
 - **Segurança:** helmet, express-validator
